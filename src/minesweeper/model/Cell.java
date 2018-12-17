@@ -2,6 +2,7 @@ package minesweeper.model;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Objects;
 
 public class Cell {
 
@@ -23,10 +24,7 @@ public class Cell {
 
     void open() {
         isOpen = true;
-        setState(State.ZERO);
-        while (state.getNumber() < bombsAround) {
-            setState(state.nextNumberState());
-        }
+        setState(State.values()[bombsAround]);
     }
 
     void mark() {
@@ -54,6 +52,23 @@ public class Cell {
     void setState(State newState) {
         changes.firePropertyChange(newState.name(), state, newState);
         this.state = newState;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Cell cell = (Cell) o;
+        return x == cell.x &&
+                y == cell.y &&
+                hasBomb == cell.hasBomb &&
+                bombsAround == cell.bombsAround &&
+                state == cell.state;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, hasBomb, bombsAround, state);
     }
 
     public State getState() {

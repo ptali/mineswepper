@@ -1,4 +1,4 @@
-package minesweeper;
+package minesweeper.controller;
 
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -17,21 +17,21 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import minesweeper.data.Score;
+import minesweeper.data.ScoreData;
 import minesweeper.model.*;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.Optional;
 
-public class Controller implements PropertyChangeListener {
+public class Controller {
 
     private static final int IMAGE_SIZE = 30;
-    static Stage stage = new Stage();
+    public static Stage stage = new Stage();
     private ImageView[][] imageView;
     private Game game;
     private Timeline timeline;
-    private ScoreData score;
+    private ScoreData scores;
 
     @FXML
     public ImageView faceImage;
@@ -52,7 +52,7 @@ public class Controller implements PropertyChangeListener {
 
     public void initialize() {
         this.game = new Game();
-        this.score = ScoreData.getInstance();
+        this.scores = ScoreData.getInstance();
         loadStateImages();
         loadTimeImages();
         loadGrid();
@@ -68,9 +68,9 @@ public class Controller implements PropertyChangeListener {
 
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
-                image = (Image) game.getBoard().getMatrix()[x][y].getState().image;
+                image = (Image) game.getBoard().getCell(x, y).getState().image;
                 imageView[x][y] = new ImageView(image);
-                game.getBoard().getMatrix()[x][y].addPropertyChangeListener(this);
+                game.getBoard().getCell(x, y).addPropertyChangeListener(new CellListener(this));
                 gridPane.add(imageView[x][y], x, y);
             }
         }
@@ -87,14 +87,14 @@ public class Controller implements PropertyChangeListener {
     }
 
     private void updateTimeView() {
-        gameTime3.setImage(getImageTime(game.getTime() % 10));
-        gameTime2.setImage(getImageTime(game.getTime() / 10 % 10));
-        gameTime1.setImage(getImageTime(game.getTime() / 100 % 10));
+        gameTime3.setImage(getImageOfNumbers(game.getTime() % 10));
+        gameTime2.setImage(getImageOfNumbers(game.getTime() / 10 % 10));
+        gameTime1.setImage(getImageOfNumbers(game.getTime() / 100 % 10));
     }
 
     private void updateBombsView() {
-        numberOfBombs3.setImage(getImageTime(game.getBombsCounter() % 10));
-        numberOfBombs2.setImage(getImageTime(game.getBombsCounter() / 10 % 10));
+        numberOfBombs3.setImage(getImageOfNumbers(game.getBombsCounter() % 10));
+        numberOfBombs2.setImage(getImageOfNumbers(game.getBombsCounter() / 10 % 10));
     }
 
     private void loadStateImages() {
@@ -114,28 +114,8 @@ public class Controller implements PropertyChangeListener {
         return new Image(getClass().getResourceAsStream(fileName));
     }
 
-    private Image getImageTime(int i) {
-        switch (i) {
-            case 1:
-                return (Image) GameTime.ONE.image;
-            case 2:
-                return (Image) GameTime.TWO.image;
-            case 3:
-                return (Image) GameTime.THREE.image;
-            case 4:
-                return (Image) GameTime.FOUR.image;
-            case 5:
-                return (Image) GameTime.FIVE.image;
-            case 6:
-                return (Image) GameTime.SIX.image;
-            case 7:
-                return (Image) GameTime.SEVEN.image;
-            case 8:
-                return (Image) GameTime.EIGHT.image;
-            case 9:
-                return (Image) GameTime.NINE.image;
-        }
-        return (Image) GameTime.ZERO.image;
+    private Image getImageOfNumbers(int i) {
+        return (Image) GameTime.values()[i].image;
     }
 
     @FXML
@@ -197,7 +177,7 @@ public class Controller implements PropertyChangeListener {
         Stage stage = new Stage();
 
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("bestscores.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/minesweeper/bestscores.fxml"));
             stage.setScene(new Scene(root));
             root.requestFocus();
 
@@ -228,7 +208,7 @@ public class Controller implements PropertyChangeListener {
 
         int x = (int) (mouseEvent.getX() / IMAGE_SIZE);
         int y = (int) (mouseEvent.getY() / IMAGE_SIZE);
-        Cell cell = game.getBoard().getMatrix()[x][y];
+        Cell cell = game.getBoard().getCell(x, y);
 
         switch (mouseEvent.getButton()) {
             case PRIMARY:
@@ -247,7 +227,7 @@ public class Controller implements PropertyChangeListener {
         if (game.getState().equals(GameState.WIN)) {
             timeline.stop();
             faceImage.setImage(new Image(getClass().getResourceAsStream("/faces/winface.png")));
-            if (score.isBestScore(game.getTime(), game.getLevel())) {
+            if (scores.isBestScore(game.getTime(), game.getLevel())) {
                 showAddScoreDialog();
             }
         }
@@ -267,7 +247,7 @@ public class Controller implements PropertyChangeListener {
         dialog.initOwner(gridPane.getScene().getWindow());
         dialog.setTitle("Congratulations!");
         FXMLLoader fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(getClass().getResource("score.fxml"));
+        fxmlLoader.setLocation(getClass().getResource("/minesweeper/score.fxml"));
 
         try {
             dialog.getDialogPane().setContent(fxmlLoader.load());
@@ -284,9 +264,9 @@ public class Controller implements PropertyChangeListener {
 
         Optional<ButtonType> result = dialog.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            Score newScore = controller.addScore();
+            Score newScore = controller.createScore();
             if (newScore != null) {
-                score.addScore(newScore, game.getLevel());
+                scores.addScore(newScore, game.getLevel());
             }
         }
     }
@@ -306,15 +286,7 @@ public class Controller implements PropertyChangeListener {
         faceImage.setImage(new Image(getClass().getResourceAsStream("/faces/yellowface.png")));
     }
 
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        Object source = evt.getSource();
-        String evtName = evt.getPropertyName();
-
-        if (source.getClass() == (Cell.class)) {
-            Cell cell = (Cell) source;
-            State state = State.valueOf(evtName);
-            imageView[cell.getX()][cell.getY()].setImage((Image) state.image);
-        }
+    public ImageView[][] getImageView() {
+        return imageView;
     }
 }

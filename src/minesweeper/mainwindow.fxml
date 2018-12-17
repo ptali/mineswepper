@@ -11,7 +11,7 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.control.Tooltip?>
 
-<BorderPane fx:controller="minesweeper.Controller"
+<BorderPane fx:controller="minesweeper.controller.Controller"
             xmlns:fx="http://javafx.com/fxml" stylesheets="@style.css">
     <top>
         <VBox>

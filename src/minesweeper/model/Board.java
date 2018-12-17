@@ -10,7 +10,7 @@ public class Board {
     private final int SIZE_X;
     private final int SIZE_Y;
     private Cell[][] matrix;
-    private final Random random;
+    private Random random;
     private int numberOfBombs;
     private int bombCounter;
     private List<Cell> allCells;
@@ -89,12 +89,16 @@ public class Board {
         int x = cell.getX();
         int y = cell.getY();
 
+        if (!matrix[x][y].equals(cell)) {
+            throw new IllegalArgumentException("Can't find this cell in the matrix.");
+        }
+
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 if (i == 0 && j == 0) {
                     continue;
                 }
-                if ((x + i) >= 0 && (y + j) >= 0 && (x + i) < SIZE_X && (y + j) < SIZE_Y) {
+                if (isInRange(x + i, y + j)) {
                     neighbours.add(matrix[x + i][y + j]);
                 }
             }
@@ -102,8 +106,11 @@ public class Board {
         return Collections.unmodifiableList(neighbours);
     }
 
-    public Cell[][] getMatrix() {
-        return matrix;
+    public Cell getCell(int x, int y) {
+        if (isInRange(x, y)) {
+            return matrix[x][y];
+        }
+        return null;
     }
 
     List<Cell> getAllCells() {

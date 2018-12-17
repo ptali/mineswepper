@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 
 <DialogPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="minesweeper.ScoreController">
+            fx:controller="minesweeper.controller.ScoreController">
     <headerText>
         Save your score:
     </headerText>

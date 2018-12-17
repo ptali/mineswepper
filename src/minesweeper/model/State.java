@@ -20,16 +20,4 @@ public enum State {
     INFORM;
 
     public Object image;
-
-    State nextNumberState() {
-        return State.values()[this.ordinal() + 1];
-    }
-
-    public int getNumber() {
-        int nr = ordinal();
-        if (nr >= State.ZERO.ordinal() && nr <= State.NUM8.ordinal()) {
-            return nr;
-        }
-        return -1;
-    }
 }

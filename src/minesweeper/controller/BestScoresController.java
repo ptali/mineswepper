@@ -1,13 +1,13 @@
-package minesweeper;
+package minesweeper.controller;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import minesweeper.data.Score;
+import minesweeper.data.ScoreData;
 import minesweeper.model.Level;
-import minesweeper.model.Score;
-import minesweeper.model.ScoreData;
 
 import java.util.Optional;
 

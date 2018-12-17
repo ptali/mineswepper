@@ -1,6 +1,7 @@
 package minesweeper.model;
 
 public class Game {
+
     private final Board board;
     private GameState gameState;
     private final Level level;
@@ -12,17 +13,21 @@ public class Game {
     private int bombsCounter;
 
     public Game() {
-        this(Level.EASY);
+        this(new Board(Level.EASY), Level.EASY);
     }
 
-    public Game(Level level) {
+    Game(Board board, Level level) {
+        this.board = board;
         this.level = level;
         gameState = GameState.CLOSED;
         sizeX = level.getSIZE_X();
         sizeY = level.getSIZE_Y();
-        board = new Board(level);
         numberOfBombs = level.getBOMBS_COUNT();
         bombsCounter = numberOfBombs;
+    }
+
+    public Game(Level level) {
+        this(new Board(level), level);
     }
 
     public void start() {
@@ -36,7 +41,6 @@ public class Game {
         } else if (cell.getState().equals(State.CLOSED)) {
             increaseBombsCounter();
         }
-        checkWinn();
     }
 
     public void openCell(Cell cell) {
@@ -86,19 +90,19 @@ public class Game {
         gameState = GameState.BOMB;
     }
 
-    private void setFlaggedToLastClosedCells() {
-        for (Cell cell : board.getAllCells()) {
-            if (cell.getState() == State.CLOSED) {
-                cell.mark();
-            }
-        }
-    }
-
     private void checkWinn() {
         int size = sizeX * sizeY;
         if (openedCells == (size - numberOfBombs)) {
             gameState = GameState.WIN;
-            setFlaggedToLastClosedCells();
+            markLastCells();
+        }
+    }
+
+    private void markLastCells() {
+        for (Cell cell:board.getAllCells()) {
+            if(cell.getState().equals(State.CLOSED)){
+                cell.setState(State.FLAGGED);
+            }
         }
     }
 

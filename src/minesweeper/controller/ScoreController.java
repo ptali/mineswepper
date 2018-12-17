@@ -1,9 +1,9 @@
-package minesweeper;
+package minesweeper.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import minesweeper.model.Score;
+import minesweeper.data.Score;
 
 public class ScoreController {
 
@@ -16,7 +16,7 @@ public class ScoreController {
         timeLabel.setText(time);
     }
 
-    Score addScore() {
+    Score createScore() {
 
         String name = nameField.getText().trim();
         if (name.isEmpty()) {

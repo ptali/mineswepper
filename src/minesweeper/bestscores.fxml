@@ -6,7 +6,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="minesweeper.BestScoresController"
+            fx:controller="minesweeper.controller.BestScoresController"
             prefHeight="326.0" prefWidth="200.0">
     <fx:define>
         <ToggleGroup fx:id="groupButtons"/>

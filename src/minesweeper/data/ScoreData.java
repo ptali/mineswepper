@@ -1,7 +1,8 @@
-package minesweeper.model;
+package minesweeper.data;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import minesweeper.model.Level;
 
 import java.io.IOException;
 import java.io.*;
@@ -19,9 +20,9 @@ public class ScoreData {
     private final String fileNameForEasyLevel = "bestscoreseasy.txt";
     private final String fileNameForMediumLevel = "bestscoresmedium.txt";
     private final String fileNameForHardLevel = "bestscoreshard.txt";
-    private ObservableList<Score> scoresEasy;
-    private ObservableList<Score> scoresMedium;
-    private ObservableList<Score> scoresHard;
+    private ObservableList<Score> scoresEasy = FXCollections.observableArrayList();
+    private ObservableList<Score> scoresMedium = FXCollections.observableArrayList();
+    private ObservableList<Score> scoresHard = FXCollections.observableArrayList();
 
     private ScoreData() {
         if (INSTANCE != null) {
@@ -87,16 +88,11 @@ public class ScoreData {
     }
 
     private boolean checkScore(int time, List<Score> list) {
-        return list.isEmpty()
-                || time < list.get(list.size() - 1).getTime()
-                || (time >= list.get(list.size() - 1).getTime() && list.size() < SCORES_SIZE);
+        return list.size() < SCORES_SIZE
+                || time < list.get(list.size() - 1).getTime();
     }
 
     public void loadBestScores() {
-        scoresEasy = FXCollections.observableArrayList();
-        scoresMedium = FXCollections.observableArrayList();
-        scoresHard = FXCollections.observableArrayList();
-
         Path pathEasyLevel = Paths.get(fileNameForEasyLevel);
         Path pathMediumLevel = Paths.get(fileNameForMediumLevel);
         Path pathHardLevel = Paths.get(fileNameForHardLevel);
@@ -107,7 +103,6 @@ public class ScoreData {
     }
 
     private void readScoresFromFile(Path path, Level level) {
-
         try {
             if (!Files.exists(path)) {
                 Files.createFile(path);
