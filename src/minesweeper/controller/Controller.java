@@ -60,6 +60,23 @@ public class Controller {
         updateBombsView();
     }
 
+    private void loadStateImages() {
+        for (State state : State.values()) {
+            state.image = (getImage(state.name().toLowerCase()));
+        }
+    }
+
+    private void loadTimeImages() {
+        for (GameTime time : GameTime.values()) {
+            time.image = (getImage("time/" + time.name().toLowerCase()));
+        }
+    }
+
+    private Image getImage(String name) {
+        String fileName = "/" + name + ".png";
+        return new Image(getClass().getResourceAsStream(fileName));
+    }
+
     private void loadGrid() {
         int sizeX = game.getSizeX();
         int sizeY = game.getSizeY();
@@ -86,32 +103,15 @@ public class Controller {
         timeline.setCycleCount(Animation.INDEFINITE);
     }
 
-    private void updateTimeView() {
-        gameTime3.setImage(getImageOfNumbers(game.getTime() % 10));
-        gameTime2.setImage(getImageOfNumbers(game.getTime() / 10 % 10));
-        gameTime1.setImage(getImageOfNumbers(game.getTime() / 100 % 10));
-    }
-
     private void updateBombsView() {
         numberOfBombs3.setImage(getImageOfNumbers(game.getBombsCounter() % 10));
         numberOfBombs2.setImage(getImageOfNumbers(game.getBombsCounter() / 10 % 10));
     }
 
-    private void loadStateImages() {
-        for (State state : State.values()) {
-            state.image = (getImage(state.name().toLowerCase()));
-        }
-    }
-
-    private void loadTimeImages() {
-        for (GameTime time : GameTime.values()) {
-            time.image = (getImage("time/" + time.name().toLowerCase()));
-        }
-    }
-
-    private Image getImage(String name) {
-        String fileName = "/" + name + ".png";
-        return new Image(getClass().getResourceAsStream(fileName));
+    private void updateTimeView() {
+        gameTime3.setImage(getImageOfNumbers(game.getTime() % 10));
+        gameTime2.setImage(getImageOfNumbers(game.getTime() / 10 % 10));
+        gameTime1.setImage(getImageOfNumbers(game.getTime() / 100 % 10));
     }
 
     private Image getImageOfNumbers(int i) {
@@ -128,7 +128,6 @@ public class Controller {
         Level level = game.getLevel();
 
         switch (level) {
-
             case EASY:
                 startEasyLevel();
                 break;
@@ -197,12 +196,12 @@ public class Controller {
 
     @FXML
     public void handleClick(MouseEvent mouseEvent) {
-        if (game.getState().equals(GameState.CLOSED)) {
+        if (!game.isStarted()) {
             game.start();
             timeline.play();
         }
 
-        if (game.getState().equals(GameState.BOMB) || game.getState().equals(GameState.WIN)) {
+        if (game.isFinished()) {
             return;
         }
 
@@ -220,11 +219,11 @@ public class Controller {
                 break;
         }
 
-        if (game.getState().equals(GameState.BOMB)) {
+        if (game.isBombed()) {
             timeline.stop();
             faceImage.setImage(new Image(getClass().getResourceAsStream("/faces/gameoverface.png")));
         }
-        if (game.getState().equals(GameState.WIN)) {
+        if (game.isWin()) {
             timeline.stop();
             faceImage.setImage(new Image(getClass().getResourceAsStream("/faces/winface.png")));
             if (scores.isBestScore(game.getTime(), game.getLevel())) {
@@ -236,6 +235,7 @@ public class Controller {
 
     private void pressLeftButton(Cell cell) {
         game.openCell(cell);
+        game.checkWinn();
     }
 
     private void pressRightButton(Cell cell) {

@@ -23,7 +23,7 @@ class BoardTest {
         Cell cell = board.getAllCells().get(2);
         List<Cell> list = board.getNeighbours(cell);
 
-        int expected = (int) list.stream().filter(Cell::ifHasBomb).count();
+        int expected = (int) list.stream().filter(Cell::hasBomb).count();
 
         assertThat(cell.getBombsAround(), is(expected));
     }
@@ -41,9 +41,9 @@ class BoardTest {
 
     @Test
     void shouldLoadMatrixWithTenBombs() {
-        List<Cell> cellslList=board.getAllCells();
+        List<Cell> cellslList = board.getAllCells();
 
-        int expected=(int)cellslList.stream().filter(Cell::ifHasBomb).count();
+        int expected = (int) cellslList.stream().filter(Cell::hasBomb).count();
 
         assertThat(10, is(expected));
     }

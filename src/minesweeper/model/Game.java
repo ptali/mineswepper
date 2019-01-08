@@ -44,8 +44,8 @@ public class Game {
     }
 
     public void openCell(Cell cell) {
-        if(cell.isClosed() || cell.isInformed()){
-            if(cell.hasBomb()){
+        if (cell.isClosed() || cell.isInformed()) {
+            if (cell.hasBomb()) {
                 openBombs(cell);
                 return;
             }
@@ -92,8 +92,8 @@ public class Game {
     }
 
     private void markLastCells() {
-        for (Cell cell:board.getAllCells()) {
-            if(cell.isClosed()){
+        for (Cell cell : board.getAllCells()) {
+            if (cell.isClosed()) {
                 cell.mark();
             }
         }
@@ -117,19 +117,19 @@ public class Game {
         timeCounter++;
     }
 
-    public boolean isStarted(){
+    public boolean isStarted() {
         return !gameState.equals(GameState.CLOSED);
     }
 
-    public boolean isFinished(){
+    public boolean isFinished() {
         return isBombed() || isWin();
     }
 
-    public boolean isBombed(){
+    public boolean isBombed() {
         return gameState.equals(GameState.BOMB);
     }
 
-    public boolean isWin(){
+    public boolean isWin() {
         return gameState.equals(GameState.WIN);
     }
 

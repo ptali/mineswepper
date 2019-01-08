@@ -21,7 +21,7 @@ public class Board {
         this.numberOfBombs = level.getBOMBS_COUNT();
 
         loadBoard();
-        loadNumberOfBombsAround();
+        loadNeighbours();
     }
 
     private Board(int x, int y) {
@@ -55,18 +55,13 @@ public class Board {
         }
     }
 
-    private void loadNumberOfBombsAround() {
+    private void loadNeighbours() {
         for (Cell cell : allCells) {
-            loadNeighbours(cell);
+            loadNumberOfBombsAround(cell);
         }
     }
 
-    private boolean isInRange(int x, int y) {
-        return x >= 0 && y >= 0 &&
-                x < SIZE_X && y < SIZE_Y;
-    }
-
-    private void loadNeighbours(Cell cell) {
+    private void loadNumberOfBombsAround(Cell cell) {
         int x = cell.getX();
         int y = cell.getY();
 
@@ -76,12 +71,17 @@ public class Board {
                     continue;
                 }
                 if (isInRange(x + i, y + j)) {
-                    if (matrix[x + i][y + j].ifHasBomb()) {
+                    if (matrix[x + i][y + j].hasBomb()) {
                         cell.incBombsAround();
                     }
                 }
             }
         }
+    }
+
+    private boolean isInRange(int x, int y) {
+        return x >= 0 && y >= 0 &&
+                x < SIZE_X && y < SIZE_Y;
     }
 
     List<Cell> getNeighbours(Cell cell) {

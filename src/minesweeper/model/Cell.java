@@ -24,10 +24,9 @@ public class Cell {
 
     void open() {
         isOpen = true;
-        if(hasBomb()){
+        if (hasBomb()) {
             setState(State.BOMBED);
-        }
-        else {
+        } else {
             setState(State.values()[bombsAround]);
         }
     }
@@ -71,15 +70,15 @@ public class Cell {
         return Objects.hash(x, y, hasBomb, bombsAround, state);
     }
 
-    boolean isClosed(){
+    boolean isClosed() {
         return state.equals(State.CLOSED);
     }
 
-    boolean isFlagged(){
+    boolean isFlagged() {
         return state.equals(State.FLAGGED);
     }
 
-    boolean isInformed(){
+    boolean isInformed() {
         return state.equals(State.INFORM);
     }
 

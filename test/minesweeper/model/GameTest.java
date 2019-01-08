@@ -33,15 +33,15 @@ class GameTest {
 
         when(board.getNeighbours(cell1)).thenReturn(Arrays.asList(cell2, cell3, cell4));
         when(board.getAllCells()).thenReturn(Arrays.asList(cell1, cell2, cell3, cell4));
-        when(cell1.getState()).thenReturn(State.CLOSED);
-        when(cell2.getState()).thenReturn(State.CLOSED);
-        when(cell3.getState()).thenReturn(State.CLOSED);
-        when(cell4.getState()).thenReturn(State.CLOSED);
+        when(cell1.isClosed()).thenReturn(true);
+        when(cell2.isClosed()).thenReturn(true);
+        when(cell3.isClosed()).thenReturn(true);
+        when(cell4.isClosed()).thenReturn(true);
     }
 
     @Test
     void shouldAllowToMarkCell() {
-        when(cell1.getState()).thenReturn(State.FLAGGED);
+        when(cell1.isFlagged()).thenReturn(true);
         game.markCell(cell1);
 
         verify(cell1, times(1)).mark();
@@ -61,9 +61,10 @@ class GameTest {
 
     @Test
     void shouldOpenBombedCellAndCellsAroundWithBombAndWrongMarkedBomb() {
-        when(cell1.ifHasBomb()).thenReturn(true);
-        when(cell2.ifHasBomb()).thenReturn(true);
-        when(cell3.getState()).thenReturn(State.FLAGGED);
+        when(cell1.hasBomb()).thenReturn(true);
+        when(cell2.hasBomb()).thenReturn(true);
+        when(cell3.isFlagged()).thenReturn(true);
+        doCallRealMethod().when(cell1).open();
 
         game.openCell(cell1);
 
