@@ -36,33 +36,43 @@ public class Game {
 
     public void markCell(Cell cell) {
         cell.mark();
-        if (cell.getState().equals(State.FLAGGED)) {
+        if (cell.isFlagged()) {
             reduceBombsCounter();
-        } else if (cell.getState().equals(State.CLOSED)) {
+        } else if (cell.isClosed()) {
             increaseBombsCounter();
         }
     }
 
     public void openCell(Cell cell) {
-        switch (cell.getState()) {
-            case OPENED:
-                break;
-            case FLAGGED:
-                break;
-            case INFORM:
-            case CLOSED:
-                if (cell.ifHasBomb()) {
-                    openBombs(cell);
-                    break;
-                }
-                if (cell.getBombsAround() == 0) {
-                    openCellsAroundZero(cell);
-                    break;
-                }
-                cell.open();
-                openedCells++;
+        if(cell.isClosed() || cell.isInformed()){
+            if(cell.hasBomb()){
+                openBombs(cell);
+                return;
+            }
+            if (cell.getBombsAround() == 0) {
+                openCellsAroundZero(cell);
+                return;
+            }
+            cell.open();
+            openedCells++;
         }
-        checkWinn();
+    }
+
+    private void openBombs(Cell cell) {
+        cell.open();
+        for (Cell around : board.getAllCells()) {
+            if (around == cell) {
+                continue;
+            }
+            if (around.hasBomb()) {
+                around.setState(State.BOMB);
+            } else {
+                if (around.isFlagged() || around.isInformed()) {
+                    around.setState(State.NOBOMB);
+                }
+            }
+        }
+        gameState = GameState.BOMB;
     }
 
     private void openCellsAroundZero(Cell cell) {
@@ -73,24 +83,7 @@ public class Game {
         }
     }
 
-    private void openBombs(Cell cell) {
-        cell.setState(State.BOMBED);
-        for (Cell around : board.getAllCells()) {
-            if (around == cell) {
-                continue;
-            }
-            if (around.ifHasBomb()) {
-                around.setState(State.BOMB);
-            } else {
-                if (around.getState() == State.FLAGGED || around.getState() == State.INFORM) {
-                    around.setState(State.NOBOMB);
-                }
-            }
-        }
-        gameState = GameState.BOMB;
-    }
-
-    private void checkWinn() {
+    public void checkWinn() {
         int size = sizeX * sizeY;
         if (openedCells == (size - numberOfBombs)) {
             gameState = GameState.WIN;
@@ -100,8 +93,8 @@ public class Game {
 
     private void markLastCells() {
         for (Cell cell:board.getAllCells()) {
-            if(cell.getState().equals(State.CLOSED)){
-                cell.setState(State.FLAGGED);
+            if(cell.isClosed()){
+                cell.mark();
             }
         }
     }
@@ -124,16 +117,28 @@ public class Game {
         timeCounter++;
     }
 
+    public boolean isStarted(){
+        return !gameState.equals(GameState.CLOSED);
+    }
+
+    public boolean isFinished(){
+        return isBombed() || isWin();
+    }
+
+    public boolean isBombed(){
+        return gameState.equals(GameState.BOMB);
+    }
+
+    public boolean isWin(){
+        return gameState.equals(GameState.WIN);
+    }
+
     public Level getLevel() {
         return level;
     }
 
     public Board getBoard() {
         return board;
-    }
-
-    public GameState getState() {
-        return gameState;
     }
 
     public int getTime() {

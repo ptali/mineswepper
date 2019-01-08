@@ -24,17 +24,22 @@ public class Cell {
 
     void open() {
         isOpen = true;
-        setState(State.values()[bombsAround]);
+        if(hasBomb()){
+            setState(State.BOMBED);
+        }
+        else {
+            setState(State.values()[bombsAround]);
+        }
     }
 
     void mark() {
         if (isOpen()) {
             return;
         }
-        if (state.equals(State.FLAGGED)) {
+        if (isFlagged()) {
             setState(State.INFORM);
             return;
-        } else if (state.equals(State.INFORM)) {
+        } else if (isInformed()) {
             setState(State.CLOSED);
             return;
         }
@@ -47,11 +52,6 @@ public class Cell {
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         changes.addPropertyChangeListener(listener);
-    }
-
-    void setState(State newState) {
-        changes.firePropertyChange(newState.name(), state, newState);
-        this.state = newState;
     }
 
     @Override
@@ -71,6 +71,31 @@ public class Cell {
         return Objects.hash(x, y, hasBomb, bombsAround, state);
     }
 
+    boolean isClosed(){
+        return state.equals(State.CLOSED);
+    }
+
+    boolean isFlagged(){
+        return state.equals(State.FLAGGED);
+    }
+
+    boolean isInformed(){
+        return state.equals(State.INFORM);
+    }
+
+    private boolean isOpen() {
+        return isOpen;
+    }
+
+    boolean hasBomb() {
+        return hasBomb;
+    }
+
+    void setState(State newState) {
+        changes.firePropertyChange(newState.name(), state, newState);
+        this.state = newState;
+    }
+
     public State getState() {
         return state;
     }
@@ -85,13 +110,5 @@ public class Cell {
 
     int getBombsAround() {
         return bombsAround;
-    }
-
-    boolean ifHasBomb() {
-        return hasBomb;
-    }
-
-    private boolean isOpen() {
-        return isOpen;
     }
 }
